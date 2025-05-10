@@ -56,7 +56,7 @@ const CurrencyChartPage = () => {
       const data = await response.json();
 
       // Extract rates, current rate, and weekly average
-      const rates = data.rates;
+      const rates = data.rates.sort((a, b) => new Date(a.date) - new Date(b.date)); 
       const labels = rates.map((rate) => rate.date);
       const rateValues = rates.map((rate) => rate.rate);
 

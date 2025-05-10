@@ -1,0 +1,39 @@
+.history-container {
+  padding: 1.5rem;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.history-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e40af;
+  margin-bottom: 1rem;
+}
+
+.history-list {
+  margin-bottom: 1.5rem;
+}
+
+.history-item {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 0.5rem;
+}
+
+.history-item p {
+  margin: 0.25rem 0;
+  color: #4b5563;
+}
+
+.history-item strong {
+  color: #111827;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
