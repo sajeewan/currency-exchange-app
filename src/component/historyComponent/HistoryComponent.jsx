@@ -4,6 +4,7 @@ import './HistoryComponent.css';
 const HistoryComponent = () => {
   const [auditTrails, setAuditTrails] = useState([]);
   const [error, setError] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const fetchAuditTrails = async () => {
@@ -32,13 +33,22 @@ const HistoryComponent = () => {
     };
 
     fetchAuditTrails();
-  }, []); // Removed `page` dependency
+  }, []);
+
+  const toggleCollapse = () => {
+    setIsCollapsed((prev) => !prev);
+  };
 
   return (
     <div className="history-container">
-      <h3 className="history-title">Audit Trail History</h3>
+      <div className="history-header">
+        <h3 className="history-title">Audit Trail History</h3>
+        <button onClick={toggleCollapse} className="collapse-button">
+          {isCollapsed ? 'Expand' : 'Collapse'}
+        </button>
+      </div>
       {error && <p className="error-message">{error}</p>}
-      <div className="history-list">
+      <div className={`history-list ${isCollapsed ? 'collapsed' : ''}`}>
         {auditTrails.length > 0 ? (
           auditTrails.map((trail) => (
             <div key={trail.id} className="history-item">
