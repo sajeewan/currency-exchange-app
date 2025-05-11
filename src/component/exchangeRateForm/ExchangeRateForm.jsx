@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import './ExchangeRateForm.css';
 
-const ExchangeRateForm = () => {
-  const [baseCurrency, setBaseCurrency] = useState('USD');
+const ExchangeRateForm = ({onRateAdded}) => {
+  const [baseCurrency, setBaseCurrency] = useState('LKR');
   const [rate, setRate] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [message, setMessage] = useState('');
 
 
-  const currencies = ['USD', 'GBP', 'AUD', 'CAD'];
+  const currencies = ['LKR', 'GBP', 'AUD', 'CAD'];
+
+   const handleRateChange = (e) => {
+    const value = e.target.value;
+    if (value === "" || /^\d*\.?\d{0,4}$/.test(value)) {
+      setRate(value);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,8 +47,9 @@ const ExchangeRateForm = () => {
 
       const data = await response.json();
       setMessage('Exchange rate added successfully!');
+      onRateAdded();
       setTimeout(() => {
-        setBaseCurrency('USD');
+        setBaseCurrency('LKR');
         setRate('');
         setDate(new Date().toISOString().split('T')[0]);
         setMessage('');
@@ -51,6 +59,8 @@ const ExchangeRateForm = () => {
       setTimeout(() => setMessage(''), 3000);
     }
   };
+
+ 
 
   return (
     <div className="exchange-form-container">
@@ -78,7 +88,7 @@ const ExchangeRateForm = () => {
             type="number"
             id="rate"
             value={rate}
-            onChange={(e) => setRate(e.target.value)}
+            onChange={handleRateChange}
             step="0.0001"
             min="0"
             required

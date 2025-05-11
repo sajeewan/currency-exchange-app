@@ -26,7 +26,7 @@ ChartJS.register(
 );
 
 const CurrencyChartPage = () => {
-  const [baseCurrency, setBaseCurrency] = useState("USD");
+  const [baseCurrency, setBaseCurrency] = useState("LKR");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [chartData, setChartData] = useState(null);
   const [currentRate, setCurrentRate] = useState(null);
@@ -35,7 +35,7 @@ const CurrencyChartPage = () => {
   const [error, setError] = useState(null);
 
   // Available currencies for the dropdown
-  const currencies = ["USD", "GBP", "AUD", "CAD"];
+  const currencies = ["LKR", "GBP", "AUD", "CAD"];
 
   // Format date for API (YYYY-MM-DD)
   const formatDate = (date) => {
@@ -47,16 +47,27 @@ const CurrencyChartPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const baseUrl = "http://127.0.0.1:8000/api"; 
+      const baseUrl = "http://127.0.0.1:8000/api";
+      const token = localStorage.getItem("authToken");
+      if (!token) throw new Error("No authentication token found");
+
       const url = `${baseUrl}/exchange-rates?base_currency=${currency}&date=${formatDate(
         date
       )}`;
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
       if (!response.ok) throw new Error("Failed to fetch exchange rates");
       const data = await response.json();
 
       // Extract rates, current rate, and weekly average
-      const rates = data.rates.sort((a, b) => new Date(a.date) - new Date(b.date)); 
+      const rates = data.rates.sort(
+        (a, b) => new Date(a.date) - new Date(b.date)
+      );
       const labels = rates.map((rate) => rate.date);
       const rateValues = rates.map((rate) => rate.rate);
 
@@ -74,7 +85,7 @@ const CurrencyChartPage = () => {
         labels: labels,
         datasets: [
           {
-            label: `Exchange Rate (${currency})`,
+            label: `${currency}/USD Exchange Rate`,
             data: rateValues,
             borderColor: "#2563eb",
             backgroundColor: "rgba(37, 99, 235, 0.1)",
@@ -98,7 +109,12 @@ const CurrencyChartPage = () => {
     fetchExchangeRates(baseCurrency, selectedDate);
   }, [baseCurrency, selectedDate]);
 
-  // Chart options 
+  // Handle refresh button click
+  const handleRefresh = () => {
+    fetchExchangeRates(baseCurrency, selectedDate);
+  };
+
+  // Chart options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -107,7 +123,7 @@ const CurrencyChartPage = () => {
       },
       title: {
         display: true,
-        text: "7-Day Currency Exchange Rate",
+        text: `${baseCurrency}/USD 7-Day Exchange Rate`,
       },
       tooltip: {
         mode: "index",
@@ -119,7 +135,7 @@ const CurrencyChartPage = () => {
               label += ": ";
             }
             if (context.parsed.y !== null) {
-              label += context.parsed.y.toFixed(4); 
+              label += context.parsed.y.toFixed(4);
             }
             return label;
           },
@@ -136,12 +152,12 @@ const CurrencyChartPage = () => {
       y: {
         title: {
           display: true,
-          text: "Exchange Rate",
+          text: "Exchange Rate (USD)",
         },
         beginAtZero: false,
         ticks: {
           callback: function (value) {
-            return value.toFixed(4); 
+            return value.toFixed(4);
           },
         },
       },
@@ -155,7 +171,7 @@ const CurrencyChartPage = () => {
 
   return (
     <div className="chart-page">
-      <h2 className="chart-title">Currency Exchange Chart</h2>
+      <h2 className="chart-title">{baseCurrency}/USD Exchange Rate Chart</h2>
       <div className="controls">
         <div className="control-group">
           <label htmlFor="currency-select">Base Currency:</label>
@@ -181,16 +197,23 @@ const CurrencyChartPage = () => {
             className="date-picker"
           />
         </div>
+        <div className="control-group">
+          <button className="refresh-button" onClick={handleRefresh}>
+            Refresh
+          </button>
+        </div>
       </div>
       {loading && <p className="loading">Loading...</p>}
       {error && <p className="error">Error: {error}</p>}
       {currentRate !== null && weeklyAverage !== null && (
         <div className="rate-info">
           <p>
-            <strong>Current Rate:</strong> {currentRate.toFixed(4)}
+            <strong>Current Rate ({baseCurrency}/USD):</strong>{" "}
+            {currentRate.toFixed(4)}
           </p>
           <p>
-            <strong>Weekly Average:</strong> {weeklyAverage.toFixed(4)}
+            <strong>Weekly Average ({baseCurrency}/USD):</strong>{" "}
+            {weeklyAverage.toFixed(4)}
           </p>
         </div>
       )}

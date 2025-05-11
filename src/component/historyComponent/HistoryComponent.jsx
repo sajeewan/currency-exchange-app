@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './HistoryComponent.css';
 
-const HistoryComponent = () => {
+const HistoryComponent = ({ refreshTrigger }) => {
   const [auditTrails, setAuditTrails] = useState([]);
   const [error, setError] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -33,7 +33,7 @@ const HistoryComponent = () => {
     };
 
     fetchAuditTrails();
-  }, []);
+  },[refreshTrigger]);
 
   const toggleCollapse = () => {
     setIsCollapsed((prev) => !prev);
